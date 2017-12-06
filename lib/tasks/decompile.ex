@@ -56,7 +56,10 @@ defmodule Mix.Tasks.Decompile do
   defp map_format("ex"), do: :expanded
   defp map_format("erl"), do: :erlang
   defp map_format("asm"), do: :to_asm
+  defp map_format("diffasm"), do: :diff_asm
+  defp map_format("disasm"), do: :to_dis
   defp map_format("kernel"), do: :to_kernel
+  defp map_format("core"), do: :to_core
   defp map_format(other), do: String.to_atom(other)
 
   defp abstract_code_decompile(_path, :expanded) do
@@ -85,26 +88,17 @@ defmodule Mix.Tasks.Decompile do
     end
   end
 
-  defp from_debug_info(:erlang, module, backend, data) do
+  defp from_debug_info(format, module, backend, data) do
     case backend.debug_info(:erlang_v1, module, data, []) do
-      {:ok, erlang_forms} ->
+      {:ok, erlang_forms} when format == :erlang ->
         format_erlang_forms(module, erlang_forms)
+
+      {:ok, erlang_forms} ->
+        from_erlang_forms(format, module, erlang_forms)
 
       {:error, error} ->
         Mix.raise(
           "Failed to extract erlang debug info for module #{inspect(module)}: #{inspect(error)}"
-        )
-    end
-  end
-
-  defp from_debug_info(other, module, backend, data) do
-    case backend.debug_info(:core_v1, module, data, []) do
-      {:ok, core} ->
-        from_core(other, module, core)
-
-      {:error, error} ->
-        Mix.raise(
-          "Failed to extract core debug info for module #{inspect(module)}: #{inspect(error)}"
         )
     end
   end
@@ -114,13 +108,14 @@ defmodule Mix.Tasks.Decompile do
   end
 
   defp from_abstract_code(other, module, forms) do
-    case :compile.noenv_forms(forms, [:to_core]) do
-      {:ok, ^module, core} ->
-        from_core(other, module, core)
+    from_erlang_forms(other, module, forms)
+    # case :compile.noenv_forms(forms, [:to_core]) do
+    #   {:ok, ^module, core} ->
+    #     from_core(other, module, core)
 
-      {:ok, ^module, core, _warnings} ->
-        from_core(other, module, core)
-    end
+    #   {:ok, ^module, core, _warnings} ->
+    #     from_core(other, module, core)
+    # end
   end
 
   defp format_elixir_info(module, elixir_info) do
@@ -152,7 +147,35 @@ defmodule Mix.Tasks.Decompile do
     end)
   end
 
-  defp from_core(format, module, core) do
-    raise "heh"
+  defp from_erlang_forms(:diff_asm, module, forms) do
+    case :compile.noenv_forms(forms, [:S]) do
+      {:ok, ^module, res} ->
+        {:ok, formatted} = :decompile_diffable_asm.format(res)
+        File.open("#{module}.S", [:write], fn file ->
+          :decompile_diffable_asm.beam_listing(file, formatted)
+        end)
+      {:error, error} ->
+        Mix.raise(
+          "Failed to compile to diffasm for module #{inspect(module)}: #{inspect(error)}"
+        )
+    end
   end
+
+  defp from_erlang_forms(format, module, forms) do
+    case :compile.noenv_forms(forms, [format]) do
+      {:ok, ^module, res} ->
+        File.open("#{module}.#{ext(format)}", [:write], fn file ->
+          :beam_listing.module(file, res)
+        end)
+      {:error, error} ->
+        Mix.raise(
+          "Failed to compile to #{inspect format} for module #{inspect(module)}: #{inspect(error)}"
+        )
+    end
+  end
+
+  defp ext(:to_core), do: "core"
+  defp ext(:to_kernel), do: "kernel"
+  defp ext(:to_asm), do: "S"
+  defp ext(other), do: other
 end
