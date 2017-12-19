@@ -4,13 +4,15 @@ defmodule Mix.Tasks.Decompile do
   def run(args) do
     {opts, modules} = OptionParser.parse!(args, strict: [to: :string])
 
+    Mix.Task.run("loadpaths")
+
     modules
     |> Enum.map(&get_beam!/1)
     |> Enum.each(&decompile(&1, opts))
   end
 
   defp get_beam!(module_or_path) do
-    with :non_existing <- :code.which(Module.concat([module_or_path])),
+    with :non_existing <- :code.which(module(module_or_path)),
          :non_existing <- :code.which(String.to_atom(module_or_path)),
          :non_existing <- get_beam_file(module_or_path),
          :non_existing <- :code.where_is_file(basename(module_or_path)) do
@@ -18,12 +20,16 @@ defmodule Mix.Tasks.Decompile do
     end
   end
 
+  defp module(string) do
+    Module.concat(String.split(string, "."))
+  end
+
   defp basename(path) do
     String.to_charlist(Path.basename(path))
   end
 
   defp get_beam_file(path) do
-    list = List.to_string(path)
+    list = String.to_charlist(path)
 
     if File.exists?(path) and not match?({:error, _, _}, :beam_lib.info(list)) do
       list
