@@ -4,18 +4,10 @@
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `decompile` to your list of dependencies in `mix.exs`:
+    mix archive.install git git@github.com:michalmuskala/decompile.git
 
-```elixir
-def deps do
-  [
-    {:decompile, "~> 0.1.0"}
-  ]
-end
-```
+## Usage
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/decompile](https://hexdocs.pm/decompile).
-
+    mix decompile ElixirModule --to erlang
+    mix decompile ElixirModule --to asm
+    mix decompile ElixirModule --to core
