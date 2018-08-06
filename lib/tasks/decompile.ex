@@ -89,7 +89,7 @@ defmodule Mix.Tasks.Decompile do
 
       {:error, error} ->
         Mix.raise(
-          "Failed to extract elixir debug info for module #{inspect(module)}: #{inspect(error)}"
+          "Failed to extract Elixir debug info for module #{inspect(module)}: #{inspect(error)}"
         )
     end
   end
@@ -104,7 +104,7 @@ defmodule Mix.Tasks.Decompile do
 
       {:error, error} ->
         Mix.raise(
-          "Failed to extract erlang debug info for module #{inspect(module)}: #{inspect(error)}"
+          "Failed to extract Erlang debug info for module #{inspect(module)}: #{inspect(error)}"
         )
     end
   end
