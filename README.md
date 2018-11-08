@@ -4,7 +4,7 @@
 
 ## Installation
 
-    mix archive.install git git@github.com:michalmuskala/decompile.git
+    mix archive.install github michalmuskala/decompile
 
 ## Usage
 
