@@ -8,6 +8,7 @@
 
 ## Usage
 
+    mix decompile ElixirModule --to expanded
     mix decompile ElixirModule --to erlang
     mix decompile ElixirModule --to asm
     mix decompile ElixirModule --to core
