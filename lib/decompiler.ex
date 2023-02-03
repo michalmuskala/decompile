@@ -138,8 +138,7 @@ defmodule Decompile.Decompiler do
         "end\n"
       ]
       |> IO.iodata_to_binary()
-
-    # |> Code.format_string!()
+      |> Code.format_string!()
 
     {module, data}
   end
@@ -147,7 +146,7 @@ defmodule Decompile.Decompiler do
   defp format_definition({{name, _arity}, kind, _meta, heads}) do
     Enum.map(heads, fn {_meta, args, _what?, body} ->
       [
-        "  #{kind} #{name}(#{Enum.map_join(args, ", ", &Macro.to_string/1)}) do\n",
+        ~s[  #{kind} unquote(:"#{name}")(#{Enum.map_join(args, ", ", &Macro.to_string/1)}) do\n],
         Macro.to_string(body),
         "  end\n"
       ]
