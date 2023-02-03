@@ -1,12 +1,14 @@
 defmodule Decompile.Decompiler do
   def run(modules, opts) do
-    Enum.each(modules, &process(&1, opts))
+    opts_as_map = Map.new(opts)
+    Enum.each(modules, &process(&1, opts_as_map))
   end
 
   def process(module_or_path, opts) do
+    opts = Map.new(opts)
     {module, data} = module_or_path |> get_beam!() |> decompile(opts)
 
-    if Keyword.get(opts, :write) do
+    if Map.get(opts, :write) do
       File.write("#{module}.ex", data)
     end
 
@@ -58,7 +60,7 @@ defmodule Decompile.Decompiler do
     end
   end
 
-  defp get_format(to: format), do: map_format(format)
+  defp get_format(%{to: format}), do: map_format(format)
   defp get_format(_), do: Mix.raise("--to option is required")
 
   defp map_format("ex"), do: :expanded
