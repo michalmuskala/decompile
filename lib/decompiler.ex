@@ -136,7 +136,8 @@ defmodule Decompile.Decompiler do
         "end\n"
       ]
       |> IO.iodata_to_binary()
-      |> Code.format_string!()
+
+    # |> Code.format_string!()
 
     {module, data}
   end
