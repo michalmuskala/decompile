@@ -1,7 +1,5 @@
 # Decompile
 
-**TODO: Add description**
-
 ## Installation
 
     mix archive.install github michalmuskala/decompile
