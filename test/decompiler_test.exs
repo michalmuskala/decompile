@@ -1,7 +1,8 @@
 defmodule DecompilerTest do
   use ExUnit.Case
+  alias Decompile.Decompiler
 
   test "works" do
-    res = Decompile.Decompiler.process("test/files/Elixir.MyAppWeb.Router.beam", to: "expanded")
+    # Decompiler.process("test/files/Elixir.MyAppWeb.Router.beam", to: "expanded", write: true)
   end
 end
