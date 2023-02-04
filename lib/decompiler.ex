@@ -11,7 +11,9 @@ defmodule Decompile.Decompiler do
     opts = Map.new(opts)
     {module, data} = module_or_path |> get_beam!() |> decompile(opts)
 
-    if Map.get(opts, :write) do
+    if Map.get(opts, :stdout) do
+      IO.puts(data)
+    else
       File.write("#{module}.ex", data)
     end
 
