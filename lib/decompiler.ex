@@ -1,4 +1,7 @@
 defmodule Decompile.Decompiler do
+  @allowed_formats ["ex", "erl", "asm", "diffasm", "kernel", "core", "expanded"]
+  def allowed_formats, do: @allowed_formats
+
   def run(modules, opts) do
     opts_as_map = Map.new(opts)
     Enum.each(modules, &process(&1, opts_as_map))
@@ -61,7 +64,7 @@ defmodule Decompile.Decompiler do
   end
 
   defp get_format(%{to: format}), do: map_format(format)
-  defp get_format(_), do: Mix.raise("--to option is required")
+  defp get_format(_), do: Mix.raise("--to option is required (#{inspect(@allowed_formats)})")
 
   defp map_format("ex"), do: :expanded
   defp map_format("erl"), do: :erlang
@@ -152,11 +155,7 @@ defmodule Decompile.Decompiler do
           ~s[  #{kind} unquote(:"#{name}")(#{Enum.map_join(args, ", ", &Macro.to_string/1)}) do\n]
         end
 
-      [
-        fhead,
-        Macro.to_string(body),
-        "  end\n"
-      ]
+      [fhead, Macro.to_string(body), "  end\n"]
     end)
   end
 
