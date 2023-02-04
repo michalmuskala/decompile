@@ -1,0 +1,3 @@
+%{
+  "test_iex": {:git, "https://github.com/mindreframer/test_iex.git", "e51a75de7b66da2517bd4b25bc2ef5660038d464", []},
+}
