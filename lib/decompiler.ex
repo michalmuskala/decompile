@@ -145,8 +145,15 @@ defmodule Decompile.Decompiler do
 
   defp format_definition({{name, _arity}, kind, _meta, heads}) do
     Enum.map(heads, fn {_meta, args, _what?, body} ->
+      fhead =
+        if Regex.match?(~r/^[a-zA-Z\d\_]+$/, "#{name}") do
+          ~s[  #{kind} #{name}(#{Enum.map_join(args, ", ", &Macro.to_string/1)}) do\n]
+        else
+          ~s[  #{kind} unquote(:"#{name}")(#{Enum.map_join(args, ", ", &Macro.to_string/1)}) do\n]
+        end
+
       [
-        ~s[  #{kind} unquote(:"#{name}")(#{Enum.map_join(args, ", ", &Macro.to_string/1)}) do\n],
+        fhead,
         Macro.to_string(body),
         "  end\n"
       ]
